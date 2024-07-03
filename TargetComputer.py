@@ -9,8 +9,11 @@ screen = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 running = True
 
+pygame.display.set_caption("Plane Game")
+
 # object setup
 plane = Plane()
+
 
 while running:
     # poll for events
@@ -26,7 +29,7 @@ while running:
     plane.move()
     
     # RENDER YOUR GAME HERE
-    pygame.draw.rect(screen, "red", (plane.x, plane.y, 50, 50))
+    screen.blit(pygame.transform.flip(plane.img, True, False), (100, 100))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
