@@ -1,5 +1,7 @@
 import pygame
-# Example file showing a basic pygame "game loop"
+
+# Import object classes
+from Plane import Plane
 
 # pygame setup
 pygame.init()
@@ -22,9 +24,12 @@ while running:
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("white")
-
+    
+    # function
+    plane.move(1,0)
+    
     # RENDER YOUR GAME HERE
-    screen.blit(pygame.transform.flip(plane.img, True, False), (100, 100))
+    screen.blit(pygame.transform.flip(plane.img, True, False), (plane.x, plane.y))
 
     # flip() the display to put your work on screen
     pygame.display.flip()

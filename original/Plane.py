@@ -7,6 +7,6 @@ class Plane:
     img = pygame.transform.scale(pygame.image.load("plane.png"), (60, 40))
     
     
-    def move(self):
-        self.x += 1
-        self.y += 1
+    def move(self, x, y):
+        self.x += x
+        self.y += y
