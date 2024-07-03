@@ -12,7 +12,7 @@ running = True
 pygame.display.set_caption("Plane Game")
 
 # object setup
-plane = Plane(1, 0)
+plane = Plane()
 
 
 while running:
