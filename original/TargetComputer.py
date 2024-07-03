@@ -2,6 +2,7 @@ import pygame
 
 # Import object classes
 from Plane import Plane
+from Cannon import Cannon
 from random import random
 
 # pygame setup
@@ -14,8 +15,8 @@ pygame.display.set_caption("Plane Game")
 
 # object setup
 plane = Plane()
-randomPath = random()*1.5-0.75
-
+cannon = Cannon()
+randomPath = (random()*2-1) * 0.4
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -32,6 +33,7 @@ while running:
     
     # RENDER YOUR GAME HERE
     screen.blit(pygame.transform.flip(plane.img, True, False), (plane.x, plane.y))
+    screen.blit(cannon.img, (cannon.x, cannon.y))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
