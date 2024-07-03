@@ -30,7 +30,7 @@ class Simple:
         range = 0
         while(range <= 1000):
             current_plane_x = self.plane_start_x + range * self.plane_velocity
-            current_plane_y = self.plane_start_y + range * self.plane_velocity
+            current_plane_y = self.plane_start_y + range * self.plane_direction
             plane_distance = math.sqrt((self.start_x - current_plane_x)**2 + (self.start_y - current_plane_y)**2)
             projectile_distance = range * self.velocity;            
         
@@ -39,9 +39,9 @@ class Simple:
             print ("Projectile Distance: ", projectile_distance)
     
             if(plane_distance <= projectile_distance):
-                self.hitpoint_x = range * self.velocity
-                self.hitpoint_y = range * self.velocity
+                self.hitpoint_x = current_plane_x
+                self.hitpoint_y = current_plane_y
                 break
-            range = range + 1
+            range = range + 0.5
             
     

@@ -27,9 +27,6 @@ plane.setRandomPath()
 hitpos = (0, 0)
 shot = False
 
-#test shot
-testProjectile = cannon.shoot(300, 100, 1)
-
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -55,19 +52,15 @@ while running:
     
     # move function calls
     projectile.move(1)
-    testProjectile.move(1)
     plane.move()
     
     # RENDER YOUR GAME HERE
     screen.blit(pygame.transform.flip(plane.img, True, False), (plane.x, plane.y))
+    pygame.draw.circle(screen, "black", (plane.x, plane.y), 2)
     screen.blit(cannon.img, (cannon.x, cannon.y))
-    pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 10)
-    pygame.draw.circle(screen, "blue", hitpos, 10)
+    pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 2)
+    pygame.draw.circle(screen, "blue", hitpos, 2)
     #pygame.draw.circle(screen, "green", (simple2.hitpoint_x, simple2.hitpoint_y), 10)
-    
-    # Hit test
-    pygame.draw.circle(screen, "red", (testProjectile.x, testProjectile.y), 10)
-    pygame.draw.circle(screen, "black", (300, 100), 10)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
