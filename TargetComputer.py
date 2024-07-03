@@ -1,11 +1,16 @@
 import pygame
-# Example file showing a basic pygame "game loop"
+
+# Import object classes
+from Plane import Plane
 
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1000, 800))
+screen = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 running = True
+
+# object setup
+plane = Plane()
 
 while running:
     # poll for events
@@ -16,13 +21,16 @@ while running:
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("white")
-
-    # RENDER YOUR GAME HERE
     
+    # function
+    plane.move()
+    
+    # RENDER YOUR GAME HERE
+    pygame.draw.rect(screen, "red", (plane.x, plane.y, 50, 50))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
+    clock.tick(5)  # limits FPS to 60
 
 pygame.quit()
