@@ -3,7 +3,7 @@ import pygame
 
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+screen = pygame.display.set_mode((1000, 800))
 clock = pygame.time.Clock()
 running = True
 
@@ -15,9 +15,10 @@ while running:
             running = False
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
+    screen.fill("white")
 
     # RENDER YOUR GAME HERE
+    
 
     # flip() the display to put your work on screen
     pygame.display.flip()
