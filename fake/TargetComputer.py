@@ -1,3 +1,4 @@
+from cgi import test
 import pygame
 
 # Import object classes
@@ -19,11 +20,15 @@ pygame.display.set_caption("Plane Game")
 
 # object setup
 plane = Plane()
-cannon = Cannon()
-projectile = cannon.shoot(1000, 300)
+cannon = Cannon(500, 550)
+projectile = None
 plane.setRandomPath()
 # Random Path with -1 to 1
+hitpos = (0, 0)
+shot = False
 
+#test shot
+testProjectile = cannon.shoot(300, 100, 1)
 
 while running:
     # poll for events
@@ -35,17 +40,34 @@ while running:
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("white")
     
-    # function
+    # function calls
+    
+    if not shot:
+        simple = Simple(cannon.x, cannon.y, plane)
+        simple.find_hitpoint()
+        projectile = cannon.shoot(simple.hitpoint_x, simple.hitpoint_y, 1)
+        hitpos = (simple.hitpoint_x, simple.hitpoint_y)
+        print (simple.hitpoint_x, simple.hitpoint_y)
+        shot = True
+        
+    #simple2 = Simple(cannon.x, cannon.y, plane)
+    #simple2.find_hitpoint()
+    
+    # move function calls
+    projectile.move(1)
+    testProjectile.move(1)
     plane.move()
-    projectile.move()
-    simple = Simple(cannon.x, cannon.y, plane)
-    simple.find_hitpoint()
     
     # RENDER YOUR GAME HERE
     screen.blit(pygame.transform.flip(plane.img, True, False), (plane.x, plane.y))
     screen.blit(cannon.img, (cannon.x, cannon.y))
-    #pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 10)
-    pygame.draw.circle(screen, "blue", (simple.hitpoint_x, simple.hitpoint_y), 10)
+    pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 10)
+    pygame.draw.circle(screen, "blue", hitpos, 10)
+    #pygame.draw.circle(screen, "green", (simple2.hitpoint_x, simple2.hitpoint_y), 10)
+    
+    # Hit test
+    pygame.draw.circle(screen, "red", (testProjectile.x, testProjectile.y), 10)
+    pygame.draw.circle(screen, "black", (300, 100), 10)
 
     # flip() the display to put your work on screen
     pygame.display.flip()

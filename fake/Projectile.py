@@ -1,16 +1,14 @@
-import pygame
+import math
 
-# Projectile Class
 class Projectile:
-    x = 0
-    y = 0
-    slope = 0
-    
-    def __init__(self, x, y, slope):
+    def __init__(self, x, y, angle, velocity):
         self.x = x
         self.y = y
-        self.slope = -slope
+        self.velocity = velocity
+        self.angle = math.radians(angle)  # Winkel in Radianten umwandeln
+        self.vx = velocity * math.cos(self.angle)
+        self.vy = -velocity * math.sin(self.angle)  # Negative, weil y nach unten zunimmt
     
-    def move(self):
-        self.x += self.slope
-        self.y += -1
+    def move(self, dt):
+        self.x += self.vx * dt
+        self.y += self.vy * dt
