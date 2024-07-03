@@ -1,7 +1,7 @@
 import pygame
 
 # Import object classes
-from Plane import Plane
+from template.Plane1 import Plane
 
 # pygame setup
 pygame.init()
@@ -26,10 +26,10 @@ while running:
     screen.fill("white")
     
     # function
-    plane.move()
+    plane.move(1,0)
     
     # RENDER YOUR GAME HERE
-    screen.blit(pygame.transform.flip(plane.img, True, False), (100, 100))
+    screen.blit(pygame.transform.flip(plane.img, True, False), (plane.x, plane.y))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
