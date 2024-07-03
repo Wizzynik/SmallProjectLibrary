@@ -4,9 +4,10 @@ import pygame
 from Plane import Plane
 from Cannon import Cannon
 from Projectile import Projectile
+from Simple import Simple
 
 # random float 
-from random import random
+
 
 # pygame setup
 pygame.init()
@@ -20,8 +21,9 @@ pygame.display.set_caption("Plane Game")
 plane = Plane()
 cannon = Cannon()
 projectile = cannon.shoot(1000, 300)
+plane.setRandomPath()
 # Random Path with -1 to 1
-randomPath = (random()*2 - 1) *0.4
+
 
 while running:
     # poll for events
@@ -34,13 +36,16 @@ while running:
     screen.fill("white")
     
     # function
-    plane.move(1,randomPath)
+    plane.move()
     projectile.move()
+    simple = Simple(cannon.x, cannon.y, plane)
+    simple.find_hitpoint()
     
     # RENDER YOUR GAME HERE
     screen.blit(pygame.transform.flip(plane.img, True, False), (plane.x, plane.y))
     screen.blit(cannon.img, (cannon.x, cannon.y))
-    pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 10)
+    #pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 10)
+    pygame.draw.circle(screen, "blue", (simple.hitpoint_x, simple.hitpoint_y), 10)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
