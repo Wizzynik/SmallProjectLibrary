@@ -6,7 +6,7 @@ class Cannon:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.img = pygame.transform.scale(pygame.image.load("fake/assets/cannon.jpg"), (50, 50))
+        self.img = pygame.transform.scale(pygame.image.load("main/assets/cannon.jpg"), (50, 50))
     
     def move(self, x, y):
         self.x += x

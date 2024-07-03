@@ -20,9 +20,11 @@ pygame.display.set_caption("Plane Game")
 
 # object setup
 plane = Plane()
+plane2 = Plane()
 cannon = Cannon(500, 550)
 projectile = None
 plane.setRandomPath()
+plane2.setRandomPath()
 # Random Path with -1 to 1
 hitpos = (0, 0)
 shot = False
@@ -40,26 +42,44 @@ while running:
     # function calls
     
     if not shot:
+        # Plane 1
         simple = Simple(cannon.x, cannon.y, plane)
         simple.find_hitpoint()
         projectile = cannon.shoot(simple.hitpoint_x, simple.hitpoint_y, 1)
         hitpos = (simple.hitpoint_x, simple.hitpoint_y)
         print (simple.hitpoint_x, simple.hitpoint_y)
+        
+        # Plane 2
+        simple2 = Simple(cannon.x, cannon.y, plane2)
+        simple2.find_hitpoint()
+        projectile2 = cannon.shoot(simple2.hitpoint_x, simple2.hitpoint_y, 1)
+        hitpos = (simple2.hitpoint_x, simple2.hitpoint_y)
+        print (simple2.hitpoint_x, simple2.hitpoint_y)
+        
         shot = True
         
-    #simple2 = Simple(cannon.x, cannon.y, plane)
-    #simple2.find_hitpoint()
+    #simple3 = Simple(cannon.x, cannon.y, plane)
+    #simple3.find_hitpoint()
     
     # move function calls
     projectile.move(1)
+    projectile2.move(1)
     plane.move()
+    plane2.move()
     
     # RENDER YOUR GAME HERE
+    # Plane 1
     screen.blit(pygame.transform.flip(plane.img, True, False), (plane.x, plane.y))
-    pygame.draw.circle(screen, "black", (plane.x, plane.y), 2)
+    pygame.draw.circle(screen, "black", (plane.x, plane.y), 6)
     screen.blit(cannon.img, (cannon.x, cannon.y))
-    pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 2)
-    pygame.draw.circle(screen, "blue", hitpos, 2)
+    pygame.draw.circle(screen, "red", (projectile.x, projectile.y), 6)
+    
+    # Plane 2
+    screen.blit(pygame.transform.flip(plane2.img, True, False), (plane2.x, plane2.y))
+    pygame.draw.circle(screen, "black", (plane2.x, plane2.y), 6)
+    screen.blit(cannon.img, (cannon.x, cannon.y))
+    pygame.draw.circle(screen, "red", (projectile2.x, projectile2.y), 6)    
+    
     #pygame.draw.circle(screen, "green", (simple2.hitpoint_x, simple2.hitpoint_y), 10)
 
     # flip() the display to put your work on screen

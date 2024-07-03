@@ -7,7 +7,7 @@ class Plane:
     y = 200
     randomPath = 0
 
-    img = pygame.transform.scale(pygame.image.load("fake/assets/plane.png"), (60, 40))
+    img = pygame.transform.scale(pygame.image.load("main/assets/plane.png"), (60, 40))
     
     def move(self):
         self.x += 1

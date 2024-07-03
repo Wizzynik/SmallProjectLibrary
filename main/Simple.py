@@ -42,6 +42,6 @@ class Simple:
                 self.hitpoint_x = current_plane_x
                 self.hitpoint_y = current_plane_y
                 break
-            range = range + 0.5
+            range = range + 0.1
             
     
