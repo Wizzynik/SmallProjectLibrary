@@ -7,6 +7,12 @@ screen = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 running = True
 
+pygame.display.set_caption("Plane Game")
+
+# object setup
+plane = Plane()
+
+
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -18,8 +24,7 @@ while running:
     screen.fill("white")
 
     # RENDER YOUR GAME HERE
-    
-    
+    screen.blit(pygame.transform.flip(plane.img, True, False), (100, 100))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
