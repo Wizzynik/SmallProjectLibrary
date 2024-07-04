@@ -6,6 +6,7 @@ from Plane import Plane
 from Cannon import Cannon
 from Projectile import Projectile
 from Simple import Simple
+from SimpleOptimized import SimpleOptimized
 
 # random float 
 
@@ -42,15 +43,15 @@ while running:
     # function calls
     
     if not shot:
-        # Plane 1
+        # Plane 1 / Simple
         simple = Simple(cannon.x, cannon.y, plane)
         simple.find_hitpoint()
         projectile = cannon.shoot(simple.hitpoint_x, simple.hitpoint_y, 1)
         hitpos = (simple.hitpoint_x, simple.hitpoint_y)
         print (simple.hitpoint_x, simple.hitpoint_y)
         
-        # Plane 2
-        simple2 = Simple(cannon.x, cannon.y, plane2)
+        # Plane 2 / Simple Optimized
+        simple2 = SimpleOptimized(cannon.x, cannon.y, plane2)
         simple2.find_hitpoint()
         projectile2 = cannon.shoot(simple2.hitpoint_x, simple2.hitpoint_y, 1)
         hitpos = (simple2.hitpoint_x, simple2.hitpoint_y)
