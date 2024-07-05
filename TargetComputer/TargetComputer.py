@@ -79,7 +79,7 @@ while running:
     screen.blit(pygame.transform.flip(plane2.img, True, False), (plane2.x, plane2.y))
     pygame.draw.circle(screen, "black", (plane2.x, plane2.y), 6)
     screen.blit(cannon.img, (cannon.x, cannon.y))
-    pygame.draw.circle(screen, "red", (projectile2.x, projectile2.y), 6)    
+    pygame.draw.circle(screen, "blue", (projectile2.x, projectile2.y), 6)    
     
     #pygame.draw.circle(screen, "green", (simple2.hitpoint_x, simple2.hitpoint_y), 10)
 
