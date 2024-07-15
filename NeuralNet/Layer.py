@@ -40,3 +40,7 @@ class Layer:
                   
         return activations
     
+    def nodeCost(outputActivation, expectedOutput):
+        error = outputActivation - expectedOutput
+        return error * error
+    
