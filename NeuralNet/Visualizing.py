@@ -36,9 +36,9 @@ while running:
 
     # fill the screen with a color to wipe away anything from the last frame
     screen.fill("white")
-    
+
     # Train the network
-    skynet.learn(datapoints, 0.4)
+    skynet.learn(datapoints, 0.1)
 
     # display the datapoints
     for point in datapoints:
@@ -46,12 +46,12 @@ while running:
         index = skynet.classify(point)
         if index == 0:
             pygame.draw.circle(screen, "purple", (point[0], point[1]), 4)
-        
+
         if point[1] < (point[0] ** 2) / 2000:
             pygame.draw.circle(screen, "green", (point[0], point[1]), 2)
         else:
             pygame.draw.circle(screen, "red", (point[0], point[1]), 2)
-        
+
     # draw function
     for x in range(1, 1000):
         y = (x ** 2) / 2000  # scale down the y-values to fit the screen height
@@ -60,8 +60,7 @@ while running:
 
     # flip the display to put your work on screen
     pygame.display.flip()
-    
-    
+
     if ticks % 60 == 0:
         print (skynet.costOverall(datapoints))
         
