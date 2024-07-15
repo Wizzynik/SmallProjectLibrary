@@ -25,6 +25,7 @@ for x in range(1, 1000, spacing * 2):
 # Create new Network and train it
 skynet = Skynet([2, 3, 2])
 
+ticks = 0
 
 while running:
     # poll for events
@@ -37,8 +38,7 @@ while running:
     screen.fill("white")
     
     # Train the network
-    skynet.learn(datapoints, 0.1)
-    
+    skynet.learn(datapoints, 0.4)
 
     # display the datapoints
     for point in datapoints:
@@ -52,7 +52,6 @@ while running:
         else:
             pygame.draw.circle(screen, "red", (point[0], point[1]), 2)
         
-
     # draw function
     for x in range(1, 1000):
         y = (x ** 2) / 2000  # scale down the y-values to fit the screen height
@@ -61,7 +60,13 @@ while running:
 
     # flip the display to put your work on screen
     pygame.display.flip()
+    
+    
+    if ticks % 60 == 0:
+        print (skynet.costOverall(datapoints))
+        
+    ticks += 1
 
-    clock.tick(10)  # limits FPS to 60
+    clock.tick(60)  # limits FPS to 10
 
 pygame.quit()
