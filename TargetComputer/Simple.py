@@ -28,20 +28,24 @@ class Simple:
 
     def find_hitpoint(self):
         range = 0
+        steps = 0 # Counter for steps
         while(range <= 1000):
+            steps += 1 # Counter for steps
             current_plane_x = self.plane_start_x + range * self.plane_velocity
             current_plane_y = self.plane_start_y + range * self.plane_direction
             plane_distance = math.sqrt((self.start_x - current_plane_x)**2 + (self.start_y - current_plane_y)**2)
             projectile_distance = range * self.velocity;            
         
-            print ("Range: ", range)
-            print ("Plane Distance: ", plane_distance)
-            print ("Projectile Distance: ", projectile_distance)
+            #print ("Range: ", range)
+            #print ("Plane Distance: ", plane_distance)
+            #print ("Projectile Distance: ", projectile_distance)
     
             if(plane_distance <= projectile_distance):
                 self.hitpoint_x = current_plane_x
                 self.hitpoint_y = current_plane_y
                 break
             range = range + 0.1
+        
+        print ("Simple Steps: ", steps)
             
     

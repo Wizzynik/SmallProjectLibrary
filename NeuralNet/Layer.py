@@ -1,0 +1,3 @@
+class Layer:
+    nodes = []
+    inputs = []
