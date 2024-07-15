@@ -1,7 +1,7 @@
 class Node:
     # Arguments
     bias = 0
-    weights = []
+    weights = [] # List of ingoing weights
     
     # Constructor
     def __init__(self, bias, weights):
@@ -14,4 +14,4 @@ class Node:
         for i in range(len(inputs)):
             sum += inputs[i] * self.weights[i]
         return sum + self.bias
-        
+    
