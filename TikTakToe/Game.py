@@ -1,4 +1,6 @@
 # Example file showing a circle moving on screen
+from turtle import pos
+from attr import field
 import pygame
 
 class Game:
@@ -63,47 +65,27 @@ class Game:
         pygame.draw.line(self.screen, color, (x+pad,y+self.SQUARE_SIZE_PX-pad), (x+self.SQUARE_SIZE_PX-pad, y+pad), width)
         pygame.draw.line(self.screen, color, (x+pad,y+pad), (x+self.SQUARE_SIZE_PX-pad, y+self.SQUARE_SIZE_PX-pad), width)
         
-    def check_win(self, player):
-        # check rows
+    def check_win(self, players):
+        def search_connected(list, x, y, dx, dy):
+            if x < 0 or x >= self.FIELD_DIMENSIONS[0] or y < 0 or y >= self.FIELD_DIMENSIONS[1]:
+                return []
+            if self.fields[x][y] != 0:
+                list.append(self.fields[x][y])
+            return [(x,y)] + search_connected(list, x + dx, y + dy, dx, dy)
+        
         for i in range(self.FIELD_DIMENSIONS[0]):
-            win = True
             for j in range(self.FIELD_DIMENSIONS[1]):
-                if self.fields[i][j] != player:
-                    win = False
-                    break
-            if win:
-                return [(i, 0), (i, self.FIELD_DIMENSIONS[1] - 1)]
-
-        # check columns
-        for j in range(self.FIELD_DIMENSIONS[1]):
-            win = True
-            for i in range(self.FIELD_DIMENSIONS[0]):
-                if self.fields[i][j] != player:
-                    win = False
-                    break
-            if win:
-                return [(0, j), (self.FIELD_DIMENSIONS[0] - 1, j)]
-
-        # check main diagonal
-        win = True
-        for i in range(self.FIELD_DIMENSIONS[0]):
-            if self.fields[i][i] != player:
-                win = False
-                break
-        if win:
-            return [(0, 0), (self.FIELD_DIMENSIONS[0] - 1, self.FIELD_DIMENSIONS[1] - 1)]
-
-        # check anti-diagonal
-        win = True
-        for i in range(self.FIELD_DIMENSIONS[0]):
-            if self.fields[i][self.FIELD_DIMENSIONS[1] - 1 - i] != player:
-                win = False
-                break
-        if win:
-            return [(0, self.FIELD_DIMENSIONS[1] - 1), (self.FIELD_DIMENSIONS[0] - 1, 0)]
-
-        # no win
-        return None
+                if not (i == 0 or j == 0): continue
+                # check rows
+                for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
+                    connected = []
+                    path = search_connected(connected, i, j, dx, dy)
+                    # Count "x" and "o" in connected list
+                    for player in players:
+                        p_count = connected.count(player)
+                        if len(path) == 3:
+                            if p_count == 3:
+                                return path
     
     def player_player(self, player_ox="o"):
         # register mouse clicks
@@ -112,11 +94,75 @@ class Game:
         y = y // self.SQUARE_SIZE_PX
         if self.fields[x][y] == 0:
             self.fields[x][y] = player_ox
+            return True
+        return False
             
     def player_ai(self, player_ox="x"):
         pass
         # TODO: Implement AI
         
+    def calc_field_startvalues(self):
+        start_values = [[0 for x in range(self.FIELD_DIMENSIONS[0])] for y in range(self.FIELD_DIMENSIONS[1])]
+        def search_connected(x, y, dx, dy):
+            if x < 0 or x >= self.FIELD_DIMENSIONS[0] or y < 0 or y >= self.FIELD_DIMENSIONS[1]:
+                return []
+            return [(x, y)] + search_connected(x + dx, y + dy, dx, dy)
+        
+        for i in range(self.FIELD_DIMENSIONS[0]):
+            for j in range(self.FIELD_DIMENSIONS[1]):
+                if self.fields[i][j] != 0: continue
+                if not (i == 0 or j == 0): continue
+                # check rows
+                possible_wins = 0
+                for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
+                    path = search_connected(i, j, dx, dy)
+                    if len(path) == 3:
+                        for x, y in path:
+                            start_values[x][y] += 1
+                 
+        return start_values
+                    
+                    
+    def calc_field_values(self, player_ox="x", opponent_ox="o"):
+        
+        def search_connected(list, x, y, dx, dy):
+            if x < 0 or x >= self.FIELD_DIMENSIONS[0] or y < 0 or y >= self.FIELD_DIMENSIONS[1]:
+                return []
+            if self.fields[x][y] == opponent_ox:
+                list.append(opponent_ox)
+            elif self.fields[x][y] == player_ox:
+                list.append(player_ox)
+            return [(x,y)] + search_connected(list, x + dx, y + dy, dx, dy)
+            
+        win_fields = []
+        lose_fields = []
+        field_values = self.calc_field_startvalues()
+        
+        for i in range(self.FIELD_DIMENSIONS[0]):
+            for j in range(self.FIELD_DIMENSIONS[1]):
+                if not (i == 0 or j == 0): continue
+                # check rows
+                for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
+                    connected = []
+                    path = search_connected(connected, i, j, dx, dy)
+                    # Count "x" and "o" in connected list
+                    p_count = connected.count(player_ox)
+                    o_count = connected.count(opponent_ox)
+                    
+                    if len(path) == 3:
+                        if p_count == 2:
+                            for x, y in path:
+                                if self.fields[x][y] == 0: 
+                                    win_fields.append((x, y))
+                        elif o_count == 2:
+                            for x, y in path:
+                                if self.fields[x][y] == 0: 
+                                    lose_fields.append((x, y))
+                    
+                        
+        print ("Win fields: ", win_fields)
+        print ("Lose fields: ", lose_fields)
+                
     def reset (self):
         self.init_Map()
                 
@@ -141,6 +187,7 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.reset()
+                        self.calc_field_startvalues()
                         game_over = False
                         player_state = 1
                     elif event.key == pygame.K_m:
@@ -149,10 +196,15 @@ class Game:
                     if not game_over and mode == 0:
                         if event.button == 1:  # Linke Maustaste
                             if player_state % 2 == 0:
-                                self.player_player("o")
+                                if self.player_player("o"):
+                                    player_state += 1
+                                    self.calc_field_values()
                             else:
-                                self.player_player("x")
-                            player_state += 1
+                                if self.player_player("x"):
+                                    player_state += 1
+                                    self.calc_field_values()
+                            
+                            
 
             # fill the screen with a color to wipe away anything from last frame
             self.screen.fill("white")
@@ -170,8 +222,8 @@ class Game:
                     pygame.draw.line(self.screen, (0, 0, 0), 
                                      (win[0][0] * self.SQUARE_SIZE_PX + self.SQUARE_SIZE_PX // 2, 
                                       win[0][1] * self.SQUARE_SIZE_PX + self.SQUARE_SIZE_PX // 2), 
-                                     (win[1][0] * self.SQUARE_SIZE_PX + self.SQUARE_SIZE_PX // 2, 
-                                      win[1][1] * self.SQUARE_SIZE_PX + self.SQUARE_SIZE_PX // 2), 8)
+                                     (win[2][0] * self.SQUARE_SIZE_PX + self.SQUARE_SIZE_PX // 2, 
+                                      win[2][1] * self.SQUARE_SIZE_PX + self.SQUARE_SIZE_PX // 2), 8)
                     game_over = True
 
             # flip() the display to put your work on screen
