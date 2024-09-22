@@ -1,4 +1,6 @@
 # Example file showing a circle moving on screen
+import copy
+from tracemalloc import start
 from turtle import pos
 from attr import field
 import pygame
@@ -11,6 +13,7 @@ class Game:
     CROSS_COLOR = (200,0,0)
     # Variables
     fields = []
+    const_start_values = None
     
     # pygame setup
     running = True
@@ -70,7 +73,7 @@ class Game:
             return []
         if self.fields[x][y] != 0:
             list.append(self.fields[x][y])
-        return [(x,y)] + self.search_connected_recursive(list, x + dx, y + dy, dx, dy)    
+        return [(x,y)] + self.search_connected_recursive(x + dx, y + dy, dx, dy, list)    
         
     def check_win(self, players):
         for i in range(self.FIELD_DIMENSIONS[0]):
@@ -79,7 +82,7 @@ class Game:
                 # check rows
                 for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
                     connected = []
-                    path = self.search_connected_recursive(connected, i, j, dx, dy)
+                    path = self.search_connected_recursive(i, j, dx, dy, connected)
                     # Count "x" and "o" in connected list
                     for player in players:
                         p_count = connected.count(player)
@@ -98,8 +101,37 @@ class Game:
         return False
             
     def player_ai(self, player_ox="x"):
-        pass
-        # TODO: Implement AI
+        start_values = copy.deepcopy(self.const_start_values)
+        field_values, win_fields, lose_fields = self.calc_field_values()
+        best_fields = []
+        best_value = 0
+        
+        if len(win_fields) > 0:
+            self.fields[win_fields[0][0]][win_fields[0][1]] = player_ox
+            return
+        if len(lose_fields) > 0:
+            self.fields[lose_fields[0][0]][lose_fields[0][1]] = player_ox
+            return
+        
+        for i in range(self.FIELD_DIMENSIONS[0]):
+            for j in range(self.FIELD_DIMENSIONS[1]):
+                if field_values[i][j] > best_value:
+                    best_value = field_values[i][j]
+                    best_fields.clear()
+                    best_fields.append((i,j))
+                elif field_values[i][j] == best_value:
+                    best_fields.append((i,j))
+        
+        if len(best_fields) == 0: return None
+        best_field = best_fields[0]
+        best_value = field_values[best_field[0]][best_field[1]] - start_values[best_field[0]][best_field[1]]
+        for field in best_fields:
+            value = field_values[field[0]][field[1]] - start_values[field[0]][field[1]]
+            if value < best_value:
+                best_value = value
+                best_field = field
+                
+        self.fields[best_field[0]][best_field[1]] = player_ox
         
     def calc_field_startvalues(self):
         start_values = [[0 for x in range(self.FIELD_DIMENSIONS[0])] for y in range(self.FIELD_DIMENSIONS[1])]
@@ -115,24 +147,35 @@ class Game:
                     if len(path) == 3:
                         for x, y in path:
                             start_values[x][y] += 1
-                 
+        
         return start_values       
                     
-    def calc_field_values(self, player_ox="x", opponent_ox="o"):
+    def calc_field_values(self, players=["o"], opponents=["x"]):
         win_fields = []
         lose_fields = []
-        field_values = self.calc_field_startvalues()
+        field_values = copy.deepcopy(self.const_start_values)
+        
+        for field in field_values:
+            print(field)
         
         for i in range(self.FIELD_DIMENSIONS[0]):
             for j in range(self.FIELD_DIMENSIONS[1]):
+                if self.fields[i][j] != 0: 
+                    field_values[i][j] = -1
+                    print ("Field", i, j, "set to -1")
                 if not (i == 0 or j == 0): continue
-                # check rows
+                
+                pathcount = 0
+                
                 for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
                     connected = []
                     path = self.search_connected_recursive(i, j, dx, dy, connected)
                     # Count "x" and "o" in connected list
-                    p_count = connected.count(player_ox)
-                    o_count = connected.count(opponent_ox)
+                    p_count = connected.count(players[0])
+                    o_count = connected.count(opponents[0])
+                    
+                    print ("For field", i,j,"Path: ", path, pathcount)
+                    pathcount += 1
                     
                     if len(path) == 3:
                         if p_count == 2:
@@ -143,10 +186,21 @@ class Game:
                             for x, y in path:
                                 if self.fields[x][y] == 0: 
                                     lose_fields.append((x, y))
-                    
-                        
+                        elif o_count > 0:
+                            for x, y in path:
+                                if self.fields[x][y] == 0: 
+                                    field_values[x][y] -= 1
+                                    print ("Field", x, y, "decreased by 1")
+                                    
+        for field in field_values:
+            print(field)
+            
+        for field in self.fields:
+            print(field)
+        
         print ("Win fields: ", win_fields)
         print ("Lose fields: ", lose_fields)
+        return field_values, win_fields, lose_fields
                 
     def reset (self):
         self.init_Map()
@@ -162,6 +216,7 @@ class Game:
         players = ["o", "x"]
         player_state = 1
         mode = 0  # 0 = pvp, 1 = pvai
+        self.const_start_values = self.calc_field_startvalues()
 
         while self.running:
             # poll for events
@@ -183,11 +238,18 @@ class Game:
                             if player_state % 2 == 0:
                                 if self.player_player("o"):
                                     player_state += 1
-                                    self.calc_field_values()
                             else:
                                 if self.player_player("x"):
                                     player_state += 1
-                                    self.calc_field_values()
+                    elif not game_over and mode == 1:
+                        if event.button == 1:
+                            print ("Player state: ", player_state)
+                            if player_state % 2 == 0:
+                                if self.player_player("o"):
+                                    player_state += 1
+                            else:
+                                self.player_ai("x")
+                                player_state += 1
                             
                             
 
