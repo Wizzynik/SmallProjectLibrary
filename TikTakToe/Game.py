@@ -1,8 +1,5 @@
 # Example file showing a circle moving on screen
 import copy
-from tracemalloc import start
-from turtle import pos
-from attr import field
 import pygame
 
 class Game:
