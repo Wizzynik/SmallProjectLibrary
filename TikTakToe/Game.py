@@ -65,21 +65,21 @@ class Game:
         pygame.draw.line(self.screen, color, (x+pad,y+self.SQUARE_SIZE_PX-pad), (x+self.SQUARE_SIZE_PX-pad, y+pad), width)
         pygame.draw.line(self.screen, color, (x+pad,y+pad), (x+self.SQUARE_SIZE_PX-pad, y+self.SQUARE_SIZE_PX-pad), width)
         
-    def check_win(self, players):
-        def search_connected(list, x, y, dx, dy):
-            if x < 0 or x >= self.FIELD_DIMENSIONS[0] or y < 0 or y >= self.FIELD_DIMENSIONS[1]:
-                return []
-            if self.fields[x][y] != 0:
-                list.append(self.fields[x][y])
-            return [(x,y)] + search_connected(list, x + dx, y + dy, dx, dy)
+    def search_connected_recursive(self, x, y, dx, dy, list=[]):
+        if x < 0 or x >= self.FIELD_DIMENSIONS[0] or y < 0 or y >= self.FIELD_DIMENSIONS[1]:
+            return []
+        if self.fields[x][y] != 0:
+            list.append(self.fields[x][y])
+        return [(x,y)] + self.search_connected_recursive(list, x + dx, y + dy, dx, dy)    
         
+    def check_win(self, players):
         for i in range(self.FIELD_DIMENSIONS[0]):
             for j in range(self.FIELD_DIMENSIONS[1]):
                 if not (i == 0 or j == 0): continue
                 # check rows
                 for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
                     connected = []
-                    path = search_connected(connected, i, j, dx, dy)
+                    path = self.search_connected_recursive(connected, i, j, dx, dy)
                     # Count "x" and "o" in connected list
                     for player in players:
                         p_count = connected.count(player)
@@ -103,10 +103,6 @@ class Game:
         
     def calc_field_startvalues(self):
         start_values = [[0 for x in range(self.FIELD_DIMENSIONS[0])] for y in range(self.FIELD_DIMENSIONS[1])]
-        def search_connected(x, y, dx, dy):
-            if x < 0 or x >= self.FIELD_DIMENSIONS[0] or y < 0 or y >= self.FIELD_DIMENSIONS[1]:
-                return []
-            return [(x, y)] + search_connected(x + dx, y + dy, dx, dy)
         
         for i in range(self.FIELD_DIMENSIONS[0]):
             for j in range(self.FIELD_DIMENSIONS[1]):
@@ -115,25 +111,14 @@ class Game:
                 # check rows
                 possible_wins = 0
                 for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
-                    path = search_connected(i, j, dx, dy)
+                    path = self.search_connected_recursive(i, j, dx, dy)
                     if len(path) == 3:
                         for x, y in path:
                             start_values[x][y] += 1
                  
-        return start_values
-                    
+        return start_values       
                     
     def calc_field_values(self, player_ox="x", opponent_ox="o"):
-        
-        def search_connected(list, x, y, dx, dy):
-            if x < 0 or x >= self.FIELD_DIMENSIONS[0] or y < 0 or y >= self.FIELD_DIMENSIONS[1]:
-                return []
-            if self.fields[x][y] == opponent_ox:
-                list.append(opponent_ox)
-            elif self.fields[x][y] == player_ox:
-                list.append(player_ox)
-            return [(x,y)] + search_connected(list, x + dx, y + dy, dx, dy)
-            
         win_fields = []
         lose_fields = []
         field_values = self.calc_field_startvalues()
@@ -144,7 +129,7 @@ class Game:
                 # check rows
                 for dx, dy in [(1, 0), (0, 1), (1, 1), (1, -1)]:
                     connected = []
-                    path = search_connected(connected, i, j, dx, dy)
+                    path = self.search_connected_recursive(i, j, dx, dy, connected)
                     # Count "x" and "o" in connected list
                     p_count = connected.count(player_ox)
                     o_count = connected.count(opponent_ox)
