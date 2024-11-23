@@ -5,7 +5,7 @@ import pygame
 class Game:
     # Constants: standart (3,3) = 3x3
     FIELD_DIMENSIONS = (3, 3)
-    SQUARE_SIZE_PX = 300
+    SQUARE_SIZE_PX = None
     CIRCLE_COLOR = (0,0,200)
     CROSS_COLOR = (200,0,0)
     # Variables
@@ -21,6 +21,7 @@ class Game:
         pygame.init()
         # Screen setup
         print("Screen setup")
+        self.cal_square_size()
         width = self.FIELD_DIMENSIONS[0] * self.SQUARE_SIZE_PX
         height = self.FIELD_DIMENSIONS[1] * self.SQUARE_SIZE_PX
         self.screen = pygame.display.set_mode((width, height))
@@ -28,6 +29,16 @@ class Game:
         print("Clock setup")
         self.clock = pygame.time.Clock()
         self.running = True
+        
+    def cal_square_size(self):
+        # Calculate square size in px based Dimensions and screen size
+        x_dim = self.FIELD_DIMENSIONS[0]
+        y_dim = self.FIELD_DIMENSIONS[1]
+        # get screen size
+        width = pygame.display.Info().current_w
+        height = pygame.display.Info().current_h
+        # calculate square size
+        self.SQUARE_SIZE_PX = int(0.8 * min((width // x_dim), (height // y_dim)))
         
     def init_Map(self):
         x_dim = self.FIELD_DIMENSIONS[0]
@@ -147,7 +158,7 @@ class Game:
         
         return start_values       
                     
-    def calc_field_values(self, players=["o"], opponents=["x"]):
+    def calc_field_values(self, players=["x"], opponents=["o"]):
         win_fields = []
         lose_fields = []
         field_values = copy.deepcopy(self.const_start_values)
@@ -171,7 +182,6 @@ class Game:
                     p_count = connected.count(players[0])
                     o_count = connected.count(opponents[0])
                     
-                    print ("For field", i,j,"Path: ", path, pathcount)
                     pathcount += 1
                     
                     if len(path) == 3:
@@ -183,11 +193,16 @@ class Game:
                             for x, y in path:
                                 if self.fields[x][y] == 0: 
                                     lose_fields.append((x, y))
+                        # Decrease value for lost line connections
                         elif o_count > 0:
                             for x, y in path:
                                 if self.fields[x][y] == 0: 
                                     field_values[x][y] -= 1
-                                    print ("Field", x, y, "decreased by 1")
+                        # Increse value for more friendly line connections
+                        elif p_count > 0:
+                            for x, y in path:
+                                if self.fields[x][y] == 0: 
+                                    field_values[x][y] += 1
                                     
         for field in field_values:
             print(field)
@@ -218,6 +233,7 @@ class Game:
         while self.running:
             # poll for events
             # pygame.QUIT event means the user clicked X to close your window
+            turn_is_over = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -238,15 +254,16 @@ class Game:
                             else:
                                 if self.player_player("x"):
                                     player_state += 1
-                    elif not game_over and mode == 1:
-                        if event.button == 1:
-                            print ("Player state: ", player_state)
-                            if player_state % 2 == 0:
-                                if self.player_player("o"):
-                                    player_state += 1
-                            else:
-                                self.player_ai("x")
+                    if not game_over and not turn_is_over and mode == 1:
+                        if not player_state % 2 == 0:
+                            if self.player_player("o"):
                                 player_state += 1
+                                turn_is_over = True
+                # AI call
+                if not game_over and not turn_is_over and player_state % 2 == 0 and mode == 1:
+                    self.player_ai("x")
+                    player_state += 1
+                    turn_is_over = True
                             
                             
 
